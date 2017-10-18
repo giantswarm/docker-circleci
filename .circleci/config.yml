@@ -30,6 +30,7 @@ jobs:
     - restore_cache:
         keys:
         - architect
+    - setup_remote_docker
     - run: ./architect --organisation=giantswarm build
 
 workflows:
