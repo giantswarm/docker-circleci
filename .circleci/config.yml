@@ -1,0 +1,42 @@
+version: 2
+jobs:
+  deps:
+    docker:
+    - image: alpine:3.6
+    steps:
+    - run: |
+        apk -Uuv add --update openssl git ca-certificates
+    - checkout
+    - run: |
+        if [ -z $RELEASE_TOKEN ]; then
+          wget -q $(wget -q https://api.github.com/repos/giantswarm/architect/releases/latest && cat latest | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
+        else
+          wget -q $(wget -q --header "Authorization: token $RELEASE_TOKEN" https://api.github.com/repos/giantswarm/architect/releases/latest && cat latest | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
+        fi
+        chmod +x ./architect
+        ./architect version
+    - save_cache:
+        key: architect
+        paths:
+        - ./architect
+
+  build:
+    docker:
+    - image: alpine:3.6
+    steps:
+    - run: |
+        apk -Uuv add --update openssl git ca-certificates
+    - checkout
+    - restore_cache:
+        keys:
+        - architect
+    - run: ./architect --organisation=giantswarm build
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - deps
+      - build:
+          requires:
+          - deps
