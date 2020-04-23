@@ -9,9 +9,9 @@ jobs:
     - checkout
     - run: |
         if [ -z $RELEASE_TOKEN ]; then
-          wget -q $(wget -q https://api.github.com/repos/giantswarm/architect/releases/latest && cat latest | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
+          wget -q $(wget -q https://api.github.com/repos/giantswarm/architect/releases/tags/v1.0.0 && cat latest | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
         else
-          wget -q $(wget -q --header "Authorization: token $RELEASE_TOKEN" https://api.github.com/repos/giantswarm/architect/releases/latest && cat latest | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
+          wget -q $(wget -q --header "Authorization: token $RELEASE_TOKEN" https://api.github.com/repos/giantswarm/architect/releases/tags/v1.0.0 && cat latest | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
         fi
         chmod +x ./architect
         ./architect version
